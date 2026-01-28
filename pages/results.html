@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aim-IB | Results</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container page-in glass">
+    <header>
+      <h1 class="title">Time’s Up! <span class="emoji">🏁</span></h1>
+      <p class="subtitle">Nice run — try to beat your score.</p>
+    </header>
+
+    <main>
+      <div class="results-box">
+        <h2>Final Score</h2>
+        <div id="final-score" class="big-number">--%</div>
+      </div>
+
+      <div class="stats-grid">
+        <div><strong>Correct:</strong> <span id="correct-count">0</span></div>
+        <div><strong>Attempted:</strong> <span id="total-count">0</span></div>
+      </div>
+
+      <div class="average-update">
+        <p>New Overall Average: <strong id="new-average">--%</strong></p>
+      </div>
+
+      <hr />
+
+      <button onclick="window.location.href='game.html'" class="btn btn-primary btn-juice">
+        <span class="btn-shine" aria-hidden="true"></span>
+        Play Again
+      </button>
+      <button onclick="window.location.href='../index.html'" class="btn btn-secondary btn-juice">
+        <span class="btn-shine" aria-hidden="true"></span>
+        Main Menu
+      </button>
+    </main>
+  </div>
+
+  <script src="../js/bg.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>

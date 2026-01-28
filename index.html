@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aim-IB | Main Menu</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Background canvas -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container page-in">
+    <header>
+      <h1 class="title">Aim-IB <span class="emoji"></span></h1>
+      <p class="subtitle">Math Speed Run</p>
+    </header>
+
+    <main class="menu-box glass">
+      <div class="stats-display">
+        <h2>Your Average</h2>
+        <div id="average-grade-display" class="big-number">--%</div>
+        <div class="hint">Beat your average. Go fast. Stay accurate.</div>
+      </div>
+
+      <div class="grade-selector">
+        <label class="label">Select Grade</label>
+
+        <div class="segmented" role="group" aria-label="Grade selection">
+          <button type="button" class="seg-btn is-active" data-grade="4">Grade 4</button>
+          <button type="button" class="seg-btn" data-grade="5">Grade 5</button>
+        </div>
+
+        <!-- keep hidden input so app.js can read grade easily -->
+        <input type="hidden" id="grade-select" value="4" />
+      </div>
+
+      <button id="start-btn" class="btn btn-primary btn-juice">
+        <span class="btn-shine" aria-hidden="true"></span>
+        Start Game
+      </button>
+
+      <div class="micro-row">
+        <div class="pill">⏱️ 60 seconds</div>
+        <div class="pill">🧠 IB-style practice</div>
+      </div>
+    </main>
+    <section class="instructions-box glass" aria-label="Game instructions">
+        <h3 class="instructions-title">How to Play</h3>
+
+        <ul class="instructions-list">
+            <li><strong>Pick a grade</strong> (4 or 5).</li>
+            <li>Press <strong>Start Game</strong> to begin a <strong>60-second</strong> speed run.</li>
+            <li>Answer as many questions as you can — <strong>fast + accurate</strong>.</li>
+            <li>Your score is <strong>% correct</strong> (rounded).</li>
+            <li>Your <strong>overall average</strong> updates after every game.</li>
+        </ul>
+
+        <div class="instructions-tip">
+            💡 Tip: Don’t overthink — your first answer is usually right.
+        </div>
+    </section>
+
+  </div>
+
+  <script src="js/bg.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

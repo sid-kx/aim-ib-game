@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aim-IB | Playing...</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container page-in glass">
+    <div class="hud">
+      <div class="timer-box">⏳ <span id="timer-display">60</span>s</div>
+      <div class="score-box">Score: <span id="score-display">0</span></div>
+    </div>
+
+    <div class="game-area">
+      <div id="question-text" class="question-box">Loading Question...</div>
+      <div id="options-container" class="options-grid"></div>
+      <div class="tiny-hint">Tip: trust your first instinct.</div>
+    </div>
+  </div>
+
+  <script src="../js/bg.js"></script>
+  <script src="../js/questions.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>
