@@ -162,9 +162,13 @@ header{
 }
 
 /* If the screen is small, allow scrolling instead of squishing */
-@media (max-height: 720px){
-  body{ overflow:auto; }
-  #bg-canvas{ position: fixed; }
+@media (max-height: 720px), (max-width: 520px){
+  body{
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
   .container{ margin: 24px 0; }
 }
 
