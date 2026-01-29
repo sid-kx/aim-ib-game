@@ -102,10 +102,6 @@ header{
   padding: 12px 14px 10px 14px;
 }
 
-.big-number{
-  font-size: 2.85rem; /* was 3.1rem */
-  margin: 8px 0 4px;
-}
 
 .micro-row{
   margin-top: 10px;
@@ -211,6 +207,17 @@ h2{
   border:1px solid rgba(0,0,0,0.06);
   padding:10px;
   border-radius: 18px;
+}
+
+/* spacing between stacked segmented rows */
+.segmented + .segmented{
+  margin-top: 10px;
+}
+
+/* 3-button row: slightly tighter so it fits on one screen */
+.segmented-3 .seg-btn{
+  padding: 11px 10px;
+  font-size: 0.98rem;
 }
 
 .seg-btn{

@@ -12,7 +12,7 @@
 
   <div class="container page-in">
     <header>
-      <h1 class="title">Aim-IB <span class="emoji"></span></h1>
+      <h1 class="title">Aim-IB <span class="emoji">🎯</span></h1>
       <p class="subtitle">Math Speed Run</p>
     </header>
 
@@ -26,9 +26,15 @@
       <div class="grade-selector">
         <label class="label">Select Grade</label>
 
-        <div class="segmented" role="group" aria-label="Grade selection">
+        <div class="segmented" role="group" aria-label="Grade selection (4 to 5)">
           <button type="button" class="seg-btn is-active" data-grade="4">Grade 4</button>
           <button type="button" class="seg-btn" data-grade="5">Grade 5</button>
+        </div>
+
+        <div class="segmented segmented-3" role="group" aria-label="Grade selection (6 to 8)">
+          <button type="button" class="seg-btn" data-grade="6">Grade 6</button>
+          <button type="button" class="seg-btn" data-grade="7">Grade 7</button>
+          <button type="button" class="seg-btn" data-grade="8">Grade 8</button>
         </div>
 
         <!-- keep hidden input so app.js can read grade easily -->
@@ -45,20 +51,19 @@
         <div class="pill">🧠 IB-style practice</div>
       </div>
     </main>
+
     <section class="instructions-box glass" aria-label="Game instructions">
-        <h3 class="instructions-title">How to Play</h3>
+      <h3 class="instructions-title">How to Play</h3>
 
-        <ul class="instructions-list">
-            <li><strong>Pick a grade</strong> (4 or 5).</li>
-            <li>Press <strong>Start Game</strong> to begin a <strong>60-second</strong> speed run.</li>
-            <li>Answer as many questions as you can — <strong>fast + accurate</strong>.</li>
-            <li>Your score is <strong>% correct</strong> (rounded).</li>
-            <li>Your <strong>overall average</strong> updates after every game.</li>
-        </ul>
+      <ul class="instructions-list">
+        <li><strong>Pick a grade</strong> (4 to 8).</li>
+        <li>Press <strong>Start Game</strong> to begin a <strong>60-second</strong> speed run.</li>
+        <li>Your <strong>overall average</strong> updates after every game.</li>
+      </ul>
 
-        <div class="instructions-tip">
-            💡 Tip: Don’t overthink — your first answer is usually right.
-        </div>
+      <div class="instructions-tip">
+        💡 Tip: Don’t overthink — your first answer is usually right.
+      </div>
     </section>
 
   </div>

@@ -7,16 +7,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const stats = StorageManager.getStats();
     document.getElementById("average-grade-display").innerText = stats.average + "%";
 
-    // Segmented grade toggle (index.html)
-    const segBtns = document.querySelectorAll(".seg-btn");
+    // Segmented grade toggle (index.html) — supports Grade 4–8
+    const segBtns = Array.from(document.querySelectorAll(".seg-btn"));
     const gradeHidden = document.getElementById("grade-select");
 
+    const setActiveGrade = (gradeValue) => {
+      if (!gradeHidden) return;
+      const g = String(gradeValue);
+      gradeHidden.value = g;
+      segBtns.forEach((b) => {
+        const isMatch = String(b.dataset.grade) === g;
+        b.classList.toggle("is-active", isMatch);
+      });
+    };
+
     if (segBtns.length && gradeHidden) {
+      // Default to last selected grade if available
+      const saved = localStorage.getItem("aimIb_currentGrade") || gradeHidden.value || "4";
+      setActiveGrade(saved);
+
       segBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
-          segBtns.forEach((b) => b.classList.remove("is-active"));
-          btn.classList.add("is-active");
-          gradeHidden.value = btn.dataset.grade;
+          setActiveGrade(btn.dataset.grade);
         });
       });
     }
@@ -47,7 +59,13 @@ let timerInterval;
 let currentQuestion;
 
 function startGameSession() {
+  // Reset session state (important when replaying)
+  score = 0;
+  totalAttempted = 0;
+  timeLeft = 60;
+
   const grade = localStorage.getItem("aimIb_currentGrade") || "4";
+  document.getElementById("timer-display").innerText = timeLeft;
   updateScoreUI();
   loadNewQuestion(grade);
 
@@ -58,6 +76,8 @@ function startGameSession() {
     // little “urgency” effect under 10s
     if (timeLeft <= 10) {
       document.getElementById("timer-display").style.filter = "drop-shadow(0 8px 14px rgba(255,92,92,0.55))";
+    } else {
+      document.getElementById("timer-display").style.filter = "";
     }
 
     if (timeLeft <= 0) endGame();
