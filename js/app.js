@@ -40,6 +40,63 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // LEADERBOARD "VIEW MORE" (Guest popup - UI only)
+  const viewMoreBtn = document.getElementById("leaderboard-more");
+  const modal = document.getElementById("signin-modal");
+  const closeBtn = document.getElementById("signin-modal-close");
+  const cancelBtn = document.getElementById("signin-modal-cancel");
+  const googleBtn = document.getElementById("signin-modal-google");
+
+  const openModal = () => {
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+    // prevent background scroll when modal is open
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeModal = () => {
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  };
+
+  // UI-only signed-in check: if the signed-in panel is visible, treat as signed in.
+  const isSignedIn = () => {
+    const signed = document.getElementById("account-signedin");
+    return signed && !signed.classList.contains("hidden");
+  };
+
+  if (viewMoreBtn) {
+    viewMoreBtn.addEventListener("click", () => {
+      if (isSignedIn()) {
+        // Later: signed-in users go to Top 100 page
+        window.location.href = "leaderboard.html";
+      } else {
+        openModal();
+      }
+    });
+  }
+
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+
+  // Placeholder: until auth is built, clicking Google just closes the modal
+  if (googleBtn) googleBtn.addEventListener("click", closeModal);
+
+  // Click outside the card closes
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  // ESC closes
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+
   // GAME PAGE
   const timerDisplay = document.getElementById("timer-display");
   if (timerDisplay) startGameSession();

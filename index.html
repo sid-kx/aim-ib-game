@@ -10,64 +10,163 @@
   <!-- Background canvas -->
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
-  <div class="container page-in">
-    <header>
-      <h1 class="title">Aim-IB <span class="emoji">🎯</span></h1>
-      <p class="subtitle">Math Speed Run</p>
-    </header>
+  <div class="dashboard">
 
-    <main class="menu-box glass">
-      <div class="stats-display">
-        <h2>Your Average</h2>
-        <div id="average-grade-display" class="big-number">--%</div>
-        <div class="hint">Beat your average. Go fast. Stay accurate.</div>
+    <!-- LEFT PANEL (Guest by default) -->
+    <aside class="account-panel glass" aria-label="Account panel">
+      <!-- Guest state -->
+      <div class="account-guest" id="account-guest">
+        <h3 class="account-title">Welcome</h3>
+        <p class="account-sub">Sign in to join the leaderboard.</p>
+
+        <button class="account-btn google-btn" type="button">
+          <span class="g-icon" aria-hidden="true">G</span>
+          Continue with Google
+        </button>
+
+        <div class="account-divider"><span>or</span></div>
+
+        <button class="account-btn secondary-btn" type="button">
+          Already have an account? Sign in
+        </button>
+
+        <p class="account-note">Guests can play, but won’t be ranked.</p>
       </div>
 
-      <div class="grade-selector">
-        <label class="label">Select Grade</label>
+      <!-- Signed-in state (hidden for now — we’ll wire it later) -->
+      <div class="account-signedin hidden" id="account-signedin">
+        <h3 class="account-title">👤 Your Account</h3>
 
-        <div class="segmented" role="group" aria-label="Grade selection (4 to 5)">
-          <button type="button" class="seg-btn is-active" data-grade="4">Grade 4</button>
-          <button type="button" class="seg-btn" data-grade="5">Grade 5</button>
+        <button class="account-btn" type="button">View Profile</button>
+        <button class="account-btn secondary-btn" type="button" disabled title="Coming soon">
+          Buy leaderboard points (soon)
+        </button>
+        <button class="account-btn danger-btn" type="button">Sign out</button>
+
+        <p class="account-note">Leaderboard ranking is based on avg correct/game.</p>
+      </div>
+    </aside>
+
+    <!-- CENTER (Main Menu) -->
+    <div class="center-panel">
+      <div class="container page-in">
+        <header>
+          <h1 class="title">Aim-IB <span class="emoji"></span></h1>
+          <p class="subtitle">Math Speed Run</p>
+        </header>
+
+        <main class="menu-box glass">
+          <div class="stats-display">
+            <h2>Your Average</h2>
+            <div id="average-grade-display" class="big-number">--%</div>
+            <div class="hint">Beat your average. Go fast. Stay accurate.</div>
+          </div>
+
+          <div class="grade-selector">
+            <label class="label">Select Grade</label>
+
+            <div class="segmented" role="group" aria-label="Grade selection (4 to 5)">
+              <button type="button" class="seg-btn is-active" data-grade="4">Grade 4</button>
+              <button type="button" class="seg-btn" data-grade="5">Grade 5</button>
+            </div>
+
+            <div class="segmented segmented-3" role="group" aria-label="Grade selection (6 to 8)">
+              <button type="button" class="seg-btn" data-grade="6">Grade 6</button>
+              <button type="button" class="seg-btn" data-grade="7">Grade 7</button>
+              <button type="button" class="seg-btn" data-grade="8">Grade 8</button>
+            </div>
+
+            <!-- keep hidden input so app.js can read grade easily -->
+            <input type="hidden" id="grade-select" value="4" />
+          </div>
+
+          <button id="start-btn" class="btn btn-primary btn-juice">
+            <span class="btn-shine" aria-hidden="true"></span>
+            Start Game
+          </button>
+
+          <div class="micro-row">
+            <div class="pill">⏱️ 60 seconds</div>
+            <div class="pill">🧠 IB-style practice</div>
+          </div>
+        </main>
+
+        <section class="instructions-box glass" aria-label="Game instructions">
+          <h3 class="instructions-title">How to Play</h3>
+
+          <ul class="instructions-list">
+            <li><strong>Pick a grade</strong> (4 to 8).</li>
+            <li>Press <strong>Start Game</strong> to begin a <strong>60-second</strong> speed run.</li>
+            <li>Your <strong>overall average</strong> updates after every game.</li>
+          </ul>
+
+          <div class="instructions-tip">
+            💡 Tip: Don’t overthink — your first answer is usually right.
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- RIGHT LEADERBOARD PANEL -->
+    <aside class="leaderboard-panel glass" aria-label="Leaderboard panel">
+      <h3 class="leaderboard-title">🏆 Leaderboard</h3>
+
+      <div class="leaderboard-list">
+        <div class="leaderboard-row gold">
+          <span class="rank">1</span>
+          <span class="name">AimMaster</span>
+          <span class="avg">93.88</span>
         </div>
 
-        <div class="segmented segmented-3" role="group" aria-label="Grade selection (6 to 8)">
-          <button type="button" class="seg-btn" data-grade="6">Grade 6</button>
-          <button type="button" class="seg-btn" data-grade="7">Grade 7</button>
-          <button type="button" class="seg-btn" data-grade="8">Grade 8</button>
+        <div class="leaderboard-row silver">
+          <span class="rank">2</span>
+          <span class="name">IBWizard</span>
+          <span class="avg">92.41</span>
         </div>
 
-        <!-- keep hidden input so app.js can read grade easily -->
-        <input type="hidden" id="grade-select" value="4" />
+        <div class="leaderboard-row bronze">
+          <span class="rank">3</span>
+          <span class="name">MathPro</span>
+          <span class="avg">91.77</span>
+        </div>
+
+        <div class="leaderboard-row">
+          <span class="rank">4</span>
+          <span class="name">FastCalc</span>
+          <span class="avg">90.63</span>
+        </div>
+
+        <div class="leaderboard-row">
+          <span class="rank">5</span>
+          <span class="name">AlphaIB</span>
+          <span class="avg">89.92</span>
+        </div>
       </div>
 
-      <button id="start-btn" class="btn btn-primary btn-juice">
-        <span class="btn-shine" aria-hidden="true"></span>
-        Start Game
-      </button>
-
-      <div class="micro-row">
-        <div class="pill">⏱️ 60 seconds</div>
-        <div class="pill">🧠 IB-style practice</div>
-      </div>
-    </main>
-
-    <section class="instructions-box glass" aria-label="Game instructions">
-      <h3 class="instructions-title">How to Play</h3>
-
-      <ul class="instructions-list">
-        <li><strong>Pick a grade</strong> (4 to 8).</li>
-        <li>Press <strong>Start Game</strong> to begin a <strong>60-second</strong> speed run.</li>
-        <li>Your <strong>overall average</strong> updates after every game.</li>
-      </ul>
-
-      <div class="instructions-tip">
-        💡 Tip: Don’t overthink — your first answer is usually right.
-      </div>
-    </section>
+      <button class="leaderboard-more" id="leaderboard-more" type="button">View more →</button>
+    </aside>
 
   </div>
 
+  <!-- Guest-only modal for View More -->
+  <div class="modal-overlay hidden" id="signin-modal" aria-hidden="true">
+    <div class="modal-card glass" role="dialog" aria-modal="true" aria-labelledby="signin-modal-title">
+      <button class="modal-close" type="button" id="signin-modal-close" aria-label="Close">×</button>
+
+      <h3 class="modal-title" id="signin-modal-title">Sign in to view the Top 100</h3>
+      <p class="modal-sub">Only signed-in players can access the full leaderboard.</p>
+
+      <button class="account-btn google-btn" type="button" id="signin-modal-google">
+        <span class="g-icon" aria-hidden="true">G</span>
+        Continue with Google
+      </button>
+
+      <button class="account-btn secondary-btn" type="button" id="signin-modal-cancel">Not now</button>
+    </div>
+  </div>
+
+  <!-- Scripts (required) -->
   <script src="js/bg.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/app.js"></script>
