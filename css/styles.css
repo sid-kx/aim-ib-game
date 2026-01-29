@@ -42,6 +42,7 @@ html, body{
 /* Prevent white flashes during iOS overscroll / pull-to-refresh */
 html{
   background-color: var(--bg1);
+  overscroll-behavior-y: contain;
 }
 body{
   background-color: var(--bg1);
