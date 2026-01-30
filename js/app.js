@@ -97,6 +97,77 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeModal();
   });
 
+  /* ===========================
+     DEV SIGNED-IN PREVIEW MODE
+     =========================== */
+
+  const guestPanel = document.getElementById("account-guest");
+  const signedPanel = document.getElementById("account-signedin");
+
+  function setSignedInUI(state) {
+    if (!guestPanel || !signedPanel) return;
+
+    if (state) {
+      guestPanel.classList.add("hidden");
+      signedPanel.classList.remove("hidden");
+      localStorage.setItem("aimIb_devSignedIn", "1");
+    } else {
+      signedPanel.classList.add("hidden");
+      guestPanel.classList.remove("hidden");
+      localStorage.removeItem("aimIb_devSignedIn");
+    }
+  }
+
+  // URL preview mode ?signedin=1
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("signedin") === "1") {
+    setSignedInUI(true);
+  }
+
+  // Persist refresh
+  if (localStorage.getItem("aimIb_devSignedIn") === "1") {
+    setSignedInUI(true);
+  }
+
+  // Shift + S toggles signed-in preview
+  document.addEventListener("keydown", (e) => {
+    if (e.shiftKey && e.key.toLowerCase() === "s") {
+      const isSigned = !signedPanel.classList.contains("hidden");
+      setSignedInUI(!isSigned);
+    }
+  });
+
+  /* ===========================
+     PROFILE MODAL (UI ONLY)
+     =========================== */
+
+  const profileBtn = document.getElementById("view-profile");
+  const profileModal = document.getElementById("profile-modal");
+  const profileClose = document.getElementById("profile-close");
+
+  if (profileBtn && profileModal) {
+    profileBtn.addEventListener("click", () => {
+      profileModal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    });
+  }
+
+  if (profileClose && profileModal) {
+    profileClose.addEventListener("click", () => {
+      profileModal.classList.add("hidden");
+      document.body.style.overflow = "";
+    });
+  }
+
+  if (profileModal) {
+    profileModal.addEventListener("click", (e) => {
+      if (e.target === profileModal) {
+        profileModal.classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+    });
+  }
+
   // GAME PAGE
   const timerDisplay = document.getElementById("timer-display");
   if (timerDisplay) startGameSession();

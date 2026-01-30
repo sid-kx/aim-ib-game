@@ -19,14 +19,14 @@
         <h3 class="account-title">Welcome</h3>
         <p class="account-sub">Sign in to join the leaderboard.</p>
 
-        <button class="account-btn google-btn" type="button">
+        <button class="account-btn google-btn" id="guest-google" type="button">
           <span class="g-icon" aria-hidden="true">G</span>
           Continue with Google
         </button>
 
         <div class="account-divider"><span>or</span></div>
 
-        <button class="account-btn secondary-btn" type="button">
+        <button class="account-btn secondary-btn" id="guest-signin" type="button">
           Already have an account? Sign in
         </button>
 
@@ -37,11 +37,11 @@
       <div class="account-signedin hidden" id="account-signedin">
         <h3 class="account-title">👤 Your Account</h3>
 
-        <button class="account-btn" type="button">View Profile</button>
-        <button class="account-btn secondary-btn" type="button" disabled title="Coming soon">
+        <button class="account-btn" id="view-profile" type="button">View Profile</button>
+        <button class="account-btn secondary-btn" id="buy-points" type="button" disabled title="Coming soon">
           Buy leaderboard points (soon)
         </button>
-        <button class="account-btn danger-btn" type="button">Sign out</button>
+        <button class="account-btn danger-btn" id="signout" type="button">Sign out</button>
 
         <p class="account-note">Leaderboard ranking is based on avg correct/game.</p>
       </div>
@@ -163,6 +163,52 @@
       </button>
 
       <button class="account-btn secondary-btn" type="button" id="signin-modal-cancel">Not now</button>
+    </div>
+  </div>
+
+  <!-- Profile modal (Signed-in users) -->
+  <div class="modal-overlay hidden" id="profile-modal" aria-hidden="true">
+    <div class="modal-card glass" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+      <button class="modal-close" type="button" id="profile-close" aria-label="Close">×</button>
+
+      <h3 class="modal-title" id="profile-title">Your Profile</h3>
+      <p class="modal-sub">Stats and account settings (UI preview).</p>
+
+      <div class="profile-grid">
+        <div class="profile-item">
+          <div class="profile-label">Username</div>
+          <input class="profile-input" id="profile-username" type="text" value="AimPlayer" />
+        </div>
+
+        <div class="profile-item">
+          <div class="profile-label">Password</div>
+          <input class="profile-input" id="profile-password" type="password" value="password" />
+        </div>
+
+        <div class="profile-item">
+          <div class="profile-label">Games played</div>
+          <div class="profile-value" id="profile-games">12</div>
+        </div>
+
+        <div class="profile-item">
+          <div class="profile-label">Total correct</div>
+          <div class="profile-value" id="profile-correct">138</div>
+        </div>
+
+        <div class="profile-item">
+          <div class="profile-label">Avg correct / game</div>
+          <div class="profile-value" id="profile-avg">11.50</div>
+        </div>
+
+        <div class="profile-item">
+          <div class="profile-label">Leaderboard rank</div>
+          <div class="profile-value" id="profile-rank">#—</div>
+        </div>
+      </div>
+
+      <button class="account-btn secondary-btn" type="button" id="profile-save" disabled title="Will work after Google sign-in is added">
+        Save changes (soon)
+      </button>
     </div>
   </div>
 
