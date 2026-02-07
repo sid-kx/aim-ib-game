@@ -817,7 +817,7 @@ hr{
 
 /* ===============================
    DESKTOP SCROLL (Leaderboard page only)
-   Requires <body class="lb-scroll"> in pages/leaderboard.html
+   Requires <body class="lb-scroll"> in leaderboard.html
 ================================ */
 @media (min-width: 901px){
   body.lb-scroll{
@@ -852,7 +852,7 @@ hr{
 
 /* ===============================
    LEADERBOARD (PC) — wider + no username truncation
-   Applies to pages/leaderboard.html (body.lb-scroll)
+   Applies to leaderboard.html (body.lb-scroll)
 ================================ */
 @media (min-width: 901px){
   /* Allow the leaderboard container to use more width on desktop */
