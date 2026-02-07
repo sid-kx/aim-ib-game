@@ -232,7 +232,7 @@ h2{
 /* 3-button row: slightly tighter so it fits on one screen */
 .segmented-3 .seg-btn{
   padding: 11px 10px;
-  font-size: 0.98rem;
+  font-size: 1.05rem;
 }
 
 .seg-btn{
@@ -246,6 +246,7 @@ h2{
   color: rgba(17,24,39,0.72);
   transition: transform 140ms ease, box-shadow 140ms ease, background 160ms ease;
   box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+  font-size: 1.05rem;
 }
 .seg-btn:hover{ transform: translateY(-1px); }
 .seg-btn:active{ transform: translateY(1px) scale(0.99); }
