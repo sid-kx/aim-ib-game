@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     viewMoreBtn.addEventListener("click", () => {
       if (isSignedIn()) {
         // Later: signed-in users go to Top 100 page
-        window.location.href = "leaderboard.html";
+        window.location.href = "pages/leaderboard.html";
       } else {
         openModal();
       }

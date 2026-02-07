@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aim-IB | Top 100 Leaderboard</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body class="lb-scroll">
+  <!-- Background canvas (same vibe as homepage) -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="container page-in">
+    <header>
+      <h1 class="title">Top 100 Leaderboard</h1>
+      <p class="subtitle">Ranking by <strong>Avg correct / game</strong></p>
+    </header>
+
+    <main class="glass" style="padding:18px; border-radius:22px; box-shadow: var(--shadow);">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <div class="pill">🏆 Top 100 (UI preview)</div>
+        <a class="btn btn-primary btn-juice" href="../index.html" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+          <span class="btn-shine" aria-hidden="true"></span>
+          Home
+        </a>
+      </div>
+
+      <div class="leaderboard-table" role="table" aria-label="Top 100 leaderboard">
+        <div class="lb-head" role="row">
+          <div class="lb-cell" role="columnheader">Rank</div>
+          <div class="lb-cell" role="columnheader">Username</div>
+          <div class="lb-cell" role="columnheader">Avg</div>
+          <div class="lb-cell" role="columnheader">Total correct</div>
+          <div class="lb-cell" role="columnheader">Games</div>
+        </div>
+
+        <div id="lb-body" class="lb-body" role="rowgroup"></div>
+      </div>
+
+      <div style="margin-top:14px; color: rgba(17,24,39,0.60); font-weight: 850; text-align:center;">
+        Guests will be blocked from this page later (Google sign-in required).
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/bg.js"></script>
+
+  <style>
+    /* Desktop scroll: override global homepage no-scroll body rules */
+    body.lb-scroll{
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      align-items: flex-start;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+
+    /* Wider layout on desktop so usernames don't get truncated */
+    body.lb-scroll .container{
+      width: min(980px, 94vw);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Keep the animated background pinned while scrolling */
+    #bg-canvas{
+      position: fixed;
+      inset: 0;
+    }
+
+    /* Lightweight page-specific table styling (keeps your main CSS untouched) */
+    .leaderboard-table{ display:block; }
+    .lb-head, .lb-row{
+      display:grid;
+      grid-template-columns: 70px 2.4fr 100px 140px 90px;
+      gap: 10px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+    .lb-head{
+      background: rgba(255,255,255,0.70);
+      border: 1px solid rgba(0,0,0,0.06);
+      font-weight: 1000;
+    }
+    .lb-body{ display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+    .lb-row{
+      background: rgba(255,255,255,0.62);
+      border: 1px solid rgba(0,0,0,0.06);
+      font-weight: 900;
+      transition: transform 140ms ease;
+    }
+    .lb-row:hover{ transform: translateY(-2px); }
+    .lb-cell{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    /* Never shorten the Username text on desktop (usernames are short anyway) */
+    @media (min-width: 901px){
+      .lb-row .lb-cell:nth-child(2),
+      .lb-head .lb-cell:nth-child(2){
+        text-overflow: clip;
+      }
+    }
+    .lb-row.gold{ background: linear-gradient(90deg,#ffd70055,#ffffffaa); }
+    .lb-row.silver{ background: linear-gradient(90deg,#cfd8dc88,#ffffffaa); }
+    .lb-row.bronze{ background: linear-gradient(90deg,#cd7f3255,#ffffffaa); }
+
+    @media (max-width: 820px){
+      .lb-head, .lb-row{
+        grid-template-columns: 52px 1fr 80px 105px 70px;
+      }
+    }
+    @media (max-width: 560px){
+      .lb-head, .lb-row{
+        grid-template-columns: 48px 1fr 72px;
+      }
+      .lb-head .lb-cell:nth-child(4),
+      .lb-head .lb-cell:nth-child(5),
+      .lb-row .lb-cell:nth-child(4),
+      .lb-row .lb-cell:nth-child(5){
+        display:none;
+      }
+    }
+  </style>
+  <script src="../js/leaderboard.js"></script>
+</body>
+</html>

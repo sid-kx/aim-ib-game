@@ -169,7 +169,7 @@ header{
     align-items: center;
     justify-content: flex-start;
   }
-  .container{ margin: 24px 0; }
+  .container{ margin: 24px auto; }
 }
 
 .stats-display{
@@ -445,6 +445,11 @@ hr{
   border: 1px solid rgba(0,0,0,0.06);
   font-weight: 900;
   color: rgba(17,24,39,0.70);
+  margin-left: auto;
+  margin-right: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ===============================
@@ -807,5 +812,57 @@ hr{
 @media (max-width: 520px){
   .profile-grid{
     grid-template-columns: 1fr;
+  }
+}
+
+/* ===============================
+   DESKTOP SCROLL (Leaderboard page only)
+   Requires <body class="lb-scroll"> in pages/leaderboard.html
+================================ */
+@media (min-width: 901px){
+  body.lb-scroll{
+    /* override homepage "app" layout */
+    display: block;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  /* Ensure the page can actually grow beyond the viewport */
+  html:has(body.lb-scroll){
+    height: auto;
+  }
+
+  body.lb-scroll .container{
+    margin: 24px auto;
+  }
+}
+
+
+/* Mobile centering helper for Top 100 rows */
+@media (max-width: 520px){
+  body.lb-scroll .lb-head,
+  body.lb-scroll .lb-row{
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ===============================
+   LEADERBOARD (PC) — wider + no username truncation
+   Applies to pages/leaderboard.html (body.lb-scroll)
+================================ */
+@media (min-width: 901px){
+  /* Allow the leaderboard container to use more width on desktop */
+  body.lb-scroll .container{
+    width: min(980px, 94vw);
+  }
+
+  /* Ensure Username column never shows as U.. on desktop */
+  body.lb-scroll .lb-head .lb-cell:nth-child(2),
+  body.lb-scroll .lb-row .lb-cell:nth-child(2){
+    text-overflow: clip !important;
   }
 }
