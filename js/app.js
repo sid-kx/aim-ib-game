@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
       closeModal();
     } catch (err) {
       console.error("Google sign-in failed:", err);
-      alert("Sign-in failed. Check console for details.");
+      alert(`${err?.code || "unknown"}\n${err?.message || err}`);
     }
   }
 
