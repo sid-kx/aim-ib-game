@@ -1,3 +1,18 @@
+// NOTE: app.js is loaded as type="module" in index.html
+import { auth, db, googleProvider } from "./firebase.js";
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 /* app.js - Main Game Logic Controller */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -62,11 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "";
   };
 
-  // UI-only signed-in check: if the signed-in panel is visible, treat as signed in.
-  const isSignedIn = () => {
-    const signed = document.getElementById("account-signedin");
-    return signed && !signed.classList.contains("hidden");
-  };
+  // Real signed-in check (Firebase Auth)
+  const isSignedIn = () => !!auth.currentUser;
 
   if (viewMoreBtn) {
     viewMoreBtn.addEventListener("click", () => {
@@ -82,20 +94,80 @@ document.addEventListener("DOMContentLoaded", () => {
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
   if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
 
-  // Placeholder: until auth is built, clicking Google just closes the modal
-  if (googleBtn) googleBtn.addEventListener("click", closeModal);
+  async function ensureUserDoc(user) {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
 
-  // Click outside the card closes
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        username: user.displayName || "AimPlayer",
+        gamesPlayed: 0,
+        totalCorrect: 0,
+        avgCorrectPerGame: 0,
+        createdAt: serverTimestamp(),
+        lastLoginAt: serverTimestamp(),
+      });
+    } else {
+      await updateDoc(ref, { lastLoginAt: serverTimestamp() });
+    }
   }
 
-  // ESC closes
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
-  });
+  async function loadProfileIntoModal() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    const u = document.getElementById("profile-username");
+    const p = document.getElementById("profile-password");
+    const games = document.getElementById("profile-games");
+    const correct = document.getElementById("profile-correct");
+    const avg = document.getElementById("profile-avg");
+    const rank = document.getElementById("profile-rank");
+    const save = document.getElementById("profile-save");
+
+    if (u) u.value = data.username ?? (user.displayName || "AimPlayer");
+    // Passwords are NOT stored/managed by Aim-IB when using Google sign-in.
+    if (p) {
+      p.value = "Signed in with Google";
+      p.type = "text";
+      p.disabled = true;
+    }
+
+    if (games) games.textContent = data.gamesPlayed ?? 0;
+    if (correct) correct.textContent = data.totalCorrect ?? 0;
+    if (avg) avg.textContent = Number(data.avgCorrectPerGame ?? 0).toFixed(2);
+    if (rank) rank.textContent = "#—"; // later: compute via leaderboard query
+
+    if (save) save.disabled = false;
+  }
+
+  async function doGoogleSignIn() {
+    try {
+      const res = await signInWithPopup(auth, googleProvider);
+      await ensureUserDoc(res.user);
+      closeModal();
+    } catch (err) {
+      console.error("Google sign-in failed:", err);
+      alert("Sign-in failed. Check console for details.");
+    }
+  }
+
+  // Google button inside the guest popup modal
+  if (googleBtn) googleBtn.addEventListener("click", doGoogleSignIn);
+
+  // Also wire the main left-panel Google button if it exists
+  const googleMainBtn =
+    document.getElementById("continue-google") ||
+    document.getElementById("google-signin") ||
+    document.getElementById("google-btn") ||
+    document.querySelector("button[data-action='google-signin']");
+
+  if (googleMainBtn) googleMainBtn.addEventListener("click", doGoogleSignIn);
 
   /* ===========================
      DEV SIGNED-IN PREVIEW MODE
@@ -110,26 +182,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (state) {
       guestPanel.classList.add("hidden");
       signedPanel.classList.remove("hidden");
-      localStorage.setItem("aimIb_devSignedIn", "1");
     } else {
       signedPanel.classList.add("hidden");
       guestPanel.classList.remove("hidden");
-      localStorage.removeItem("aimIb_devSignedIn");
     }
   }
 
-  // URL preview mode ?signedin=1
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("signedin") === "1") {
-    setSignedInUI(true);
-  }
-
-  // Persist refresh
-  if (localStorage.getItem("aimIb_devSignedIn") === "1") {
-    setSignedInUI(true);
-  }
-
-  // Shift + S toggles signed-in preview
+  // Shift + S toggles signed-in UI preview (does not affect real auth)
   document.addEventListener("keydown", (e) => {
     if (e.shiftKey && e.key.toLowerCase() === "s") {
       const isSigned = !signedPanel.classList.contains("hidden");
@@ -146,9 +205,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileClose = document.getElementById("profile-close");
 
   if (profileBtn && profileModal) {
-    profileBtn.addEventListener("click", () => {
+    profileBtn.addEventListener("click", async () => {
       profileModal.classList.remove("hidden");
       document.body.style.overflow = "hidden";
+      await loadProfileIntoModal();
     });
   }
 
@@ -167,6 +227,91 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Save profile changes (username only)
+  const profileSave = document.getElementById("profile-save");
+  if (profileSave) {
+    profileSave.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Please sign in with Google first.");
+        return;
+      }
+
+      const input = document.getElementById("profile-username");
+      if (!input) return;
+
+      const username = input.value.trim();
+      if (username.length < 3 || username.length > 18) {
+        alert("Username must be 3–18 characters.");
+        return;
+      }
+      if (!/^[a-zA-Z0-9_ ]+$/.test(username)) {
+        alert("Use only letters, numbers, spaces, or _");
+        return;
+      }
+
+      const oldText = profileSave.textContent;
+      profileSave.disabled = true;
+      profileSave.textContent = "Saving...";
+
+      try {
+        const ref = doc(db, "users", user.uid);
+        await updateDoc(ref, { username });
+        profileSave.textContent = "Saved ✅";
+        setTimeout(() => {
+          profileSave.textContent = oldText;
+          profileSave.disabled = false;
+        }, 900);
+      } catch (err) {
+        console.error(err);
+        alert("Save failed. Check console.");
+        profileSave.textContent = oldText;
+        profileSave.disabled = false;
+      }
+    });
+  }
+
+  const signOutBtn =
+    document.getElementById("signout-btn") ||
+    document.getElementById("sign-out") ||
+    document.querySelector("button[data-action='signout']");
+
+  if (signOutBtn) {
+    signOutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+      } catch (e) {
+        console.error("Sign out failed:", e);
+      }
+    });
+  }
+
+  // Click outside the card closes
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  // ESC closes
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+
+  // Real auth state -> drives UI
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      setSignedInUI(true);
+      try {
+        await ensureUserDoc(user);
+      } catch (e) {
+        console.error("ensureUserDoc failed:", e);
+      }
+    } else {
+      setSignedInUI(false);
+    }
+  });
 
   // GAME PAGE
   const timerDisplay = document.getElementById("timer-display");
@@ -274,7 +419,11 @@ function endGame() {
     JSON.stringify({ score, attempted: totalAttempted, percentage })
   );
 
+  // Update local average for guests and for quick UI
   StorageManager.saveGameResult(percentage);
+
+  // Persist real stats to Firestore for signed-in users (rank is based on avg correct/game)
+  StorageManager.saveRun({ correct: score, attempted: totalAttempted, percent: percentage }).catch(() => {});
 
   window.location.href = "results.html";
 }
