@@ -6,7 +6,7 @@ import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCtt1Xi0AvPnQ_hcIZ_1I9bAvBU6x1ekw0",
+  apiKey: "AIzaSyCtt1Xi0AvPnQ_hcIZ_119bAvBU6x1ekw0",
   authDomain: "aim-ib.firebaseapp.com",
   projectId: "aim-ib",
   storageBucket: "aim-ib.firebasestorage.app",
