@@ -27,8 +27,8 @@
   <!-- storage.js is a module (imports firebase.js) but still exposes window.StorageManager -->
   <script type="module" src="../js/storage.js"></script>
 
-  <!-- questions.js stays classic so it defines window.QuestionGenerator -->
-  <script src="../js/questions.js"></script>
+  <!-- questions.js must be a module so app.js can import it reliably (it can still attach to window) -->
+  <script type="module" src="../js/questions.js"></script>
 
   <!-- app.js is a module (imports firebase.js) and uses StorageManager + QuestionGenerator -->
   <script type="module" src="../js/app.js"></script>

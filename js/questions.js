@@ -403,3 +403,18 @@ const QuestionGenerator = {
     return { question: qText, options, correctIndex };
   }
 };
+
+// ----------------------------
+// Exports / global fallback
+// ----------------------------
+// If the rest of the app uses ES modules, these exports allow:
+//   import QuestionGenerator from "./questions.js";
+//   import { QuestionGenerator } from "./questions.js";
+export { QuestionGenerator };
+export default QuestionGenerator;
+
+// If any older script on the site expects a global (non-module) variable,
+// expose it safely.
+if (typeof window !== "undefined") {
+  window.QuestionGenerator = QuestionGenerator;
+}

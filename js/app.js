@@ -188,13 +188,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Shift + S toggles signed-in UI preview (does not affect real auth)
-  document.addEventListener("keydown", (e) => {
-    if (e.shiftKey && e.key.toLowerCase() === "s") {
-      const isSigned = !signedPanel.classList.contains("hidden");
-      setSignedInUI(!isSigned);
+  function forceGuestMode() {
+    // Close any open modals
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.setAttribute("aria-hidden", "true");
     }
-  });
+    if (profileModal) {
+      profileModal.classList.add("hidden");
+      profileModal.setAttribute("aria-hidden", "true");
+    }
+
+    // Re-enable page scroll
+    document.body.style.overflow = "";
+
+    // Flip UI panels
+    setSignedInUI(false);
+
+    // Optional: disable profile save button until signed in
+    const saveBtn = document.getElementById("profile-save");
+    if (saveBtn) saveBtn.disabled = true;
+  }
+
 
   /* ===========================
      PROFILE MODAL (UI ONLY)
@@ -206,7 +221,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (profileBtn && profileModal) {
     profileBtn.addEventListener("click", async () => {
+      if (!isSignedIn()) {
+        // Guests must sign in first
+        openModal();
+        return;
+      }
       profileModal.classList.remove("hidden");
+      profileModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
       await loadProfileIntoModal();
     });
@@ -273,6 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const signOutBtn =
+    document.getElementById("signout") ||
     document.getElementById("signout-btn") ||
     document.getElementById("sign-out") ||
     document.querySelector("button[data-action='signout']");
@@ -283,6 +305,9 @@ document.addEventListener("DOMContentLoaded", () => {
         await signOut(auth);
       } catch (e) {
         console.error("Sign out failed:", e);
+      } finally {
+        // Immediately reflect guest UI
+        forceGuestMode();
       }
     });
   }
@@ -309,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("ensureUserDoc failed:", e);
       }
     } else {
-      setSignedInUI(false);
+      forceGuestMode();
     }
   });
 
