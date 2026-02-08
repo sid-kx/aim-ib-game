@@ -331,6 +331,20 @@ let timeLeft = 60;
 let timerInterval;
 let currentQuestion;
 
+let _qgRetries = 0;
+const _QG_MAX_RETRIES = 60; // ~6s at 100ms
+
+function _getQuestionGenerator() {
+  // questions.js defines a global QuestionGenerator (classic script)
+  return window.QuestionGenerator;
+}
+
+function _generateQuestionOrNull(grade) {
+  const QG = _getQuestionGenerator();
+  if (!QG || typeof QG.generate !== "function") return null;
+  return QG.generate(grade);
+}
+
 function startGameSession() {
   // Reset session state (important when replaying)
   score = 0;
@@ -340,6 +354,7 @@ function startGameSession() {
   const grade = localStorage.getItem("aimIb_currentGrade") || "4";
   document.getElementById("timer-display").innerText = timeLeft;
   updateScoreUI();
+  _qgRetries = 0;
   loadNewQuestion(grade);
 
   timerInterval = setInterval(() => {
@@ -358,8 +373,32 @@ function startGameSession() {
 }
 
 function loadNewQuestion(grade) {
-  currentQuestion = QuestionGenerator.generate(grade);
+  const q = _generateQuestionOrNull(grade);
 
+  // If questions.js hasn't loaded yet (or failed), keep retrying briefly.
+  if (!q) {
+    _qgRetries++;
+
+    const qt = document.getElementById("question-text");
+    if (qt) {
+      qt.innerText = _qgRetries <= 1
+        ? "Loading questions…"
+        : `Loading questions… (${_qgRetries})`;
+    }
+
+    if (_qgRetries <= _QG_MAX_RETRIES) {
+      setTimeout(() => loadNewQuestion(grade), 100);
+    } else {
+      if (qt) qt.innerText = "Questions failed to load. Please refresh.";
+      console.error("QuestionGenerator not available. Check that questions.js is loaded before app.js on pages/game.html");
+    }
+    return;
+  }
+
+  // Reset retry counter once we successfully load.
+  _qgRetries = 0;
+
+  currentQuestion = q;
   document.getElementById("question-text").innerText = currentQuestion.question;
 
   const optionsContainer = document.getElementById("options-container");
