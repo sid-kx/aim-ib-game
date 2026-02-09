@@ -152,13 +152,23 @@ header{
 
 .instructions-tip{
   margin-top: 10px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 14px;
   background: rgba(255,255,255,0.65);
   border: 1px solid rgba(0,0,0,0.06);
   color: rgba(17,24,39,0.70);
   font-weight: 900;
   font-size: 0.92rem;
+
+  /* Center footer text + button */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  width: 100%;
+  align-self: stretch;
 }
 
 /* If the screen is small, allow scrolling instead of squishing */
@@ -288,6 +298,16 @@ h2{
 .btn:hover{ transform: translateY(-2px); filter: brightness(1.03); }
 .btn:active{ transform: translateY(1px) scale(0.99); }
 
+/* Accessible focus rings (keyboard) */
+:where(.btn, .account-btn, .seg-btn, .leaderboard-more, .option-btn, .modal-close, .github-link):focus{
+  outline: none;
+}
+:where(.btn, .account-btn, .seg-btn, .leaderboard-more, .option-btn, .modal-close, .github-link):focus-visible{
+  outline: 3px solid rgba(77,168,255,0.55);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(77,168,255,0.18);
+}
+
 .btn-juice{
   animation: breathe 2.8s ease-in-out infinite;
 }
@@ -309,6 +329,10 @@ h2{
   35%{ opacity:1; }
   70%{ transform: rotate(20deg) translateX(70%); opacity:0; }
   100%{ opacity:0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
 /* Game HUD */
@@ -655,6 +679,7 @@ hr{
   background: linear-gradient(90deg,#cd7f3255,#ffffffaa);
 }
 
+
 .leaderboard-more{
   margin-top:14px;
   width:100%;
@@ -665,6 +690,41 @@ hr{
   font-weight:950;
   background: linear-gradient(90deg,var(--primary),var(--purple));
   color:white;
+}
+
+.github-link{
+  transition: transform 140ms ease, filter 160ms ease, box-shadow 160ms ease;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 14px 28px rgba(77,168,255,0.18);
+
+  /* Center the button under the text */
+  margin: 0 auto;
+  align-self: center;
+}
+
+.github-link:hover{
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}
+
+.github-link:active{
+  transform: translateY(1px) scale(0.99);
+}
+
+@media (max-width: 520px){
+  .github-link{
+    margin: 0 auto;
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* Mobile stacking */

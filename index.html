@@ -26,7 +26,7 @@
 
         <div class="account-divider"><span>or</span></div>
 
-        <button class="account-btn secondary-btn" id="guest-signin" type="button">
+        <button class="account-btn secondary-btn" id="guest-signin" type="button" data-action="google-signin">
           Already have an account? Sign in
         </button>
 
@@ -101,7 +101,10 @@
           </ul>
 
           <div class="instructions-tip">
-            💡 Tip: Don’t overthink — your first answer is usually right.
+            Made with Love by Sidhant Kamboj
+            <a class="leaderboard-more github-link" href="https://github.com/sid-kx/aim-ib-game" target="_blank" rel="noopener noreferrer">
+              View on GitHub →
+            </a>
           </div>
         </section>
 
@@ -112,7 +115,7 @@
     <aside class="leaderboard-panel glass" aria-label="Leaderboard panel">
       <h3 class="leaderboard-title">🏆 Leaderboard</h3>
 
-      <div class="leaderboard-list">
+      <div class="leaderboard-list" id="mainmenu-leaderboard-list" data-mode="guest">
         <div class="leaderboard-row gold">
           <span class="rank">1</span>
           <span class="name">AimMaster</span>
@@ -142,6 +145,10 @@
           <span class="name">AlphaIB</span>
           <span class="avg">89.92</span>
         </div>
+      </div>
+
+      <div class="leaderboard-hint hidden" id="mainmenu-leaderboard-hint" aria-live="polite">
+        Couldn’t load leaderboard right now.
       </div>
 
       <button class="leaderboard-more" id="leaderboard-more" type="button">View more →</button>
