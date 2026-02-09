@@ -514,9 +514,9 @@ function endGame() {
     console.warn("StorageManager.saveRun failed:", e);
   }
 
-  // If we are in /pages/, go up one level to reach /results.html
+  // If we are in /pages/, go up one level to reach /pages/results.html
   const inPages = window.location.pathname.includes("/pages/");
-  window.location.href = inPages ? "../results.html" : "results.html";
+  window.location.href = inPages ? "../pages/results.html" : "results.html";
 }
 
 /* ===========================
