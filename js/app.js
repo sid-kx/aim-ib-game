@@ -12,6 +12,11 @@ import {
   updateDoc,
   increment,
   serverTimestamp,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* app.js - Main Game Logic Controller */
@@ -29,6 +34,7 @@ async function ensureUserDoc(user) {
       gamesPlayed: 0,
       totalCorrect: 0,
       totalAttempted: 0,
+      totalPercentSum: 0,
       avgCorrectPerGame: 0,
       avgPercent: 0,
       createdAt: serverTimestamp(),
@@ -45,35 +51,40 @@ async function commitRunToFirestore({ correct, attempted }) {
 
   const ref = doc(db, "users", user.uid);
 
+  const c = Number(correct) || 0;
+  const a = Number(attempted) || 0;
+  const percent = a > 0 ? +((c / a) * 100).toFixed(2) : 0;
+
   // Ensure doc exists (updateDoc fails if missing)
   const snap0 = await getDoc(ref);
   if (!snap0.exists()) {
     await ensureUserDoc(user);
   }
 
-  // 1) increment totals
+  // 1) increment totals + percent sum (this should happen ONCE per game)
   await updateDoc(ref, {
     gamesPlayed: increment(1),
-    totalCorrect: increment(Number(correct) || 0),
-    totalAttempted: increment(Number(attempted) || 0),
+    totalCorrect: increment(c),
+    totalAttempted: increment(a),
+    totalPercentSum: increment(percent),
+    lastGameAt: serverTimestamp(),
   });
 
-  // 2) recompute averages from stored totals
+  // 2) recompute averages from stored aggregates
   const snap = await getDoc(ref);
   if (!snap.exists()) return;
   const data = snap.data() || {};
 
   const gp = Number(data.gamesPlayed || 0);
   const tc = Number(data.totalCorrect || 0);
-  const ta = Number(data.totalAttempted || 0);
+  const ps = Number(data.totalPercentSum || 0);
 
   const avgCorrect = gp > 0 ? +(tc / gp).toFixed(2) : 0;
-  const avgPercent = ta > 0 ? +((tc / ta) * 100).toFixed(2) : 0;
+  const avgPercent = gp > 0 ? +(ps / gp).toFixed(2) : 0;
 
   await updateDoc(ref, {
     avgCorrectPerGame: avgCorrect,
     avgPercent: avgPercent,
-    lastGameAt: serverTimestamp(),
   });
 }
 
@@ -188,9 +199,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (games) games.textContent = data.gamesPlayed ?? 0;
-    if (correct) correct.textContent = data.totalCorrect ?? data.correct ?? 0;
-    if (avg) avg.textContent = Number(data.avgCorrectPerGame ?? 0).toFixed(2);
-    if (rank) rank.textContent = "#—"; // later: compute via leaderboard query
+    if (correct) correct.textContent = data.totalCorrect ?? 0;
+    if (avg) avg.textContent = `${Number(data.avgPercent ?? 0).toFixed(2)}%`;
+    if (rank) {
+      rank.textContent = "#—";
+      try {
+        // Compute rank from Top 100 sorted by avgPercent (desc)
+        const qTop = query(collection(db, "users"), orderBy("avgPercent", "desc"), limit(100));
+        const qs = await getDocs(qTop);
+        let pos = 0;
+        let found = false;
+        qs.forEach((d) => {
+          pos += 1;
+          if (d.id === user.uid) found = pos;
+        });
+        rank.textContent = found ? `#${found}` : "#—";
+      } catch (e) {
+        console.warn("Rank compute failed:", e);
+        rank.textContent = "#—";
+      }
+    }
 
     if (save) save.disabled = false;
   }
@@ -552,18 +580,6 @@ async function endGame() {
     console.warn("StorageManager.saveGameResult failed:", e);
   }
 
-  // Persist stats (await BEFORE navigating away)
-  try {
-    if (window.StorageManager && typeof window.StorageManager.saveRun === "function") {
-      await window.StorageManager.saveRun({
-        correct: score,
-        attempted: totalAttempted,
-        percent: percentage,
-      });
-    }
-  } catch (e) {
-    console.warn("StorageManager.saveRun failed:", e);
-  }
 
   try {
     await commitRunToFirestore({ correct: score, attempted: totalAttempted });

@@ -40,15 +40,14 @@ const StorageManager = {
     stats.average = Math.round(stats.totalScoreSum / stats.gamesPlayed);
     localStorage.setItem(this.KEY, JSON.stringify(stats));
 
-    // Also attempt to sync to cloud if signed in.
-    // We treat `newPercentage` as a "score" fallback if the game doesn't provide correct/attempted yet.
-    // Later, when we connect real game stats, call saveRun({correct, attempted}).
-    this.saveRun({ percent: Number(newPercentage) || 0 }).catch(() => {});
+    // NOTE: Do NOT sync to Firestore from here.
+    // Firestore stats are committed exactly once per finished game from the game logic
+    // (e.g., in app.js via commitRunToFirestore / StorageManager.saveRun with correct/attempted).
   },
 
   // ===== Cloud (signed-in) =====
   // Preferred API for the real leaderboard ranking.
-  // Pass correct/attempted when available.
+  // Pass correct/attempted and percent at end-of-game ONLY (one call per finished game).
   async saveRun({ correct = null, attempted = null, percent = null } = {}) {
     const user = auth.currentUser;
     if (!user) return; // guest
@@ -90,7 +89,10 @@ const StorageManager = {
       // Track an average percent as well (useful for your homepage "average grade")
       const prevAvgPercent = Number(d.avgPercent || 0);
       const pct = percent == null ? null : Number(percent);
-      const avgPercent = pct == null ? prevAvgPercent : ((prevAvgPercent * (gamesPlayed - 1)) + pct) / gamesPlayed;
+      // Average the per-game percent values (running mean)
+      const avgPercent = pct == null
+        ? prevAvgPercent
+        : ((prevAvgPercent * (gamesPlayed - 1)) + pct) / gamesPlayed;
 
       tx.set(
         ref,
