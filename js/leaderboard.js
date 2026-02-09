@@ -1,5 +1,5 @@
 // Aim-IB — Top 100 Leaderboard (Firestore)
-// Renders users ordered by avgCorrectPerGame desc into #lb-body.
+// Renders users ordered by avgPercent desc into #lb-body.
 
 import { db } from "./firebase.js";
 import {
@@ -40,14 +40,14 @@ async function renderTop100FromFirestore() {
   `;
 
   try {
-    // Primary query: order by avgCorrectPerGame (fast + server-side sorting).
+    // Primary query: order by avgPercent (fast + server-side sorting).
     // If this fails (e.g., rules/index issues), we fall back to a simple collection read.
     let snap;
 
     try {
       const q = query(
         collection(db, "users"),
-        orderBy("avgCorrectPerGame", "desc"),
+        orderBy("avgPercent", "desc"),
         limit(200)
       );
 
@@ -70,7 +70,7 @@ async function renderTop100FromFirestore() {
       if (games <= 0) return; // only rank players who have played
 
       const username = escapeHtml(d.username || "AimPlayer");
-      const avgNum = Number(d.avgCorrectPerGame || 0);
+      const avgNum = Number(d.avgPercent || 0);
       const avg = avgNum.toFixed(2);
       const totalCorrect = Number(d.totalCorrect || 0);
 
@@ -88,7 +88,7 @@ async function renderTop100FromFirestore() {
       return;
     }
 
-    // Sort: avgCorrectPerGame desc, then gamesPlayed desc, then username asc.
+    // Sort: avgPercent desc, then gamesPlayed desc, then username asc.
     players.sort((a, b) => {
       if (b.avgNum !== a.avgNum) return b.avgNum - a.avgNum;
       if (b.games !== a.games) return b.games - a.games;
@@ -110,7 +110,7 @@ async function renderTop100FromFirestore() {
           <div class="lb-row ${medal}" role="row">
             <div class="lb-cell" role="cell">${p.rank}</div>
             <div class="lb-cell" role="cell">${p.username}</div>
-            <div class="lb-cell" role="cell"><strong>${p.avg}</strong></div>
+            <div class="lb-cell" role="cell"><strong>${p.avg}%</strong></div>
             <div class="lb-cell" role="cell">${p.totalCorrect}</div>
             <div class="lb-cell" role="cell">${p.games}</div>
           </div>

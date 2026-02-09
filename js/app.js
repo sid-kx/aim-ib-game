@@ -432,6 +432,7 @@ let totalAttempted = 0;
 let timeLeft = 60;
 let timerInterval;
 let currentQuestion;
+let _gameEnded = false;
 
 let _qgRetries = 0;
 const _QG_MAX_RETRIES = 60; // ~6s at 100ms
@@ -452,6 +453,7 @@ function startGameSession() {
   score = 0;
   totalAttempted = 0;
   timeLeft = 60;
+  _gameEnded = false;
 
   const grade = localStorage.getItem("aimIb_currentGrade") || "4";
   const td = document.getElementById("timer-display");
@@ -473,8 +475,11 @@ function startGameSession() {
         td2.style.filter = "";
       }
     }
-
-    if (timeLeft <= 0) endGame();
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      if (td2) td2.innerText = timeLeft;
+      endGame();
+    }
   }, 1000);
 }
 
@@ -560,6 +565,8 @@ function updateScoreUI() {
 
 async function endGame() {
   clearInterval(timerInterval);
+  if (_gameEnded) return;
+  _gameEnded = true;
 
   let percentage = 0;
   if (totalAttempted > 0) {
