@@ -152,15 +152,51 @@ header{
 
 .instructions-tip{
   margin-top: 10px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 14px;
   background: rgba(255,255,255,0.65);
   border: 1px solid rgba(0,0,0,0.06);
   color: rgba(17,24,39,0.70);
   font-weight: 900;
   font-size: 0.92rem;
+
+  /* Center content + button underneath */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+/* GitHub button inside the tip box */
+.instructions-tip a,
+.instructions-tip button{
+  width: fit-content;
+  min-width: 220px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 950;
+  text-decoration: none;
+  color: white;
+  background: linear-gradient(90deg, var(--primary), var(--purple));
+  box-shadow: 0 16px 32px rgba(77,168,255,0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.instructions-tip a:hover,
+.instructions-tip button:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.instructions-tip a:active,
+.instructions-tip button:active{
+  transform: translateY(1px) scale(0.99);
+}
 /* If the screen is small, allow scrolling instead of squishing */
 @media (max-height: 720px), (max-width: 520px){
   body{
@@ -590,11 +626,11 @@ hr{
 }
 
 .leaderboard-panel{
-  width:260px;
-  padding:18px;
-  border-radius:22px;
+  width: 320px;
+  padding: 18px;
+  border-radius: 22px;
   box-shadow: var(--shadow);
-  height: 360px;
+  height: 400px;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
@@ -616,13 +652,14 @@ hr{
 
 .leaderboard-row{
   display:grid;
-  grid-template-columns: 26px 1fr auto;
+  grid-template-columns: 30px 1fr auto;
   align-items:center;
-  padding:10px 12px;
-  border-radius:14px;
+  column-gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
   background: rgba(255,255,255,0.65);
   border:1px solid rgba(0,0,0,0.06);
-  font-weight:900;
+  font-weight: 900;
   transition: transform .15s ease;
 }
 
@@ -636,11 +673,17 @@ hr{
 }
 
 .name{
-  font-size:0.95rem;
+  font-size: 1.02rem;
+  line-height: 1.15;
+  white-space: normal;      /* allow wrap */
+  overflow: visible;
+  text-overflow: unset;
+  word-break: break-word;   /* prevents overflow on long names */
 }
 
 .avg{
-  font-weight:950;
+  font-weight: 1000;
+  font-variant-numeric: tabular-nums;
 }
 
 .gold{
@@ -684,6 +727,7 @@ hr{
   }
 
   .leaderboard-panel{
+    height: auto;
     width:92vw;
     max-width:520px;
   }
