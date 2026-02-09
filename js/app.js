@@ -16,12 +16,77 @@ import {
 
 /* app.js - Main Game Logic Controller */
 
+// ----------------------------
+// Firestore user doc helpers (module-scope)
+// ----------------------------
+async function ensureUserDoc(user) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      username: user.displayName || "AimPlayer",
+      gamesPlayed: 0,
+      totalCorrect: 0,
+      totalAttempted: 0,
+      avgCorrectPerGame: 0,
+      avgPercent: 0,
+      createdAt: serverTimestamp(),
+      lastLoginAt: serverTimestamp(),
+    });
+  } else {
+    await updateDoc(ref, { lastLoginAt: serverTimestamp() });
+  }
+}
+
+async function commitRunToFirestore({ correct, attempted }) {
+  const user = auth.currentUser;
+  if (!user) return; // guests don't write
+
+  const ref = doc(db, "users", user.uid);
+
+  // Ensure doc exists (updateDoc fails if missing)
+  const snap0 = await getDoc(ref);
+  if (!snap0.exists()) {
+    await ensureUserDoc(user);
+  }
+
+  // 1) increment totals
+  await updateDoc(ref, {
+    gamesPlayed: increment(1),
+    totalCorrect: increment(Number(correct) || 0),
+    totalAttempted: increment(Number(attempted) || 0),
+  });
+
+  // 2) recompute averages from stored totals
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+  const data = snap.data() || {};
+
+  const gp = Number(data.gamesPlayed || 0);
+  const tc = Number(data.totalCorrect || 0);
+  const ta = Number(data.totalAttempted || 0);
+
+  const avgCorrect = gp > 0 ? +(tc / gp).toFixed(2) : 0;
+  const avgPercent = ta > 0 ? +((tc / ta) * 100).toFixed(2) : 0;
+
+  await updateDoc(ref, {
+    avgCorrectPerGame: avgCorrect,
+    avgPercent: avgPercent,
+    lastGameAt: serverTimestamp(),
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // MAIN MENU
   const startBtn = document.getElementById("start-btn");
   if (startBtn) {
-    const stats = StorageManager.getStats();
-    document.getElementById("average-grade-display").innerText = stats.average + "%";
+    const stats = (window.StorageManager && typeof window.StorageManager.getStats === "function")
+      ? window.StorageManager.getStats()
+      : { average: 0 };
+
+    const avgEl = document.getElementById("average-grade-display");
+    if (avgEl) avgEl.innerText = stats.average + "%";
 
     // Segmented grade toggle (index.html) — supports Grade 4–8
     const segBtns = Array.from(document.querySelectorAll(".seg-btn"));
@@ -95,49 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
   if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
 
-  async function ensureUserDoc(user) {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      await setDoc(ref, {
-        username: user.displayName || "AimPlayer",
-        gamesPlayed: 0,
-        totalCorrect: 0,
-        avgCorrectPerGame: 0,
-        createdAt: serverTimestamp(),
-        lastLoginAt: serverTimestamp(),
-      });
-    } else {
-      await updateDoc(ref, { lastLoginAt: serverTimestamp() });
-    }
-  }
-
-  async function commitRunToFirestore({ correct }) {
-    const user = auth.currentUser;
-    if (!user) return; // guests don't write
-
-    const ref = doc(db, "users", user.uid);
-
-    // 1) increment totals
-    await updateDoc(ref, {
-      gamesPlayed: increment(1),
-      totalCorrect: increment(Number(correct) || 0),
-    });
-
-    // 2) recompute average (server values)
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data() || {};
-
-    const gp = Number(data.gamesPlayed || 0);
-    const tc = Number(data.totalCorrect || 0);
-    const avg = gp > 0 ? +(tc / gp).toFixed(2) : 0;
-
-    await updateDoc(ref, {
-      avgCorrectPerGame: avg,
-    });
-  }
 
   async function loadProfileIntoModal() {
     const user = auth.currentUser;
@@ -508,7 +530,7 @@ function updateScoreUI() {
 }
 
 
-function endGame() {
+async function endGame() {
   clearInterval(timerInterval);
 
   let percentage = 0;
@@ -530,30 +552,29 @@ function endGame() {
     console.warn("StorageManager.saveGameResult failed:", e);
   }
 
-  // Persist stats
-  // 1) If StorageManager exists, let it do its thing (local + optional remote)
+  // Persist stats (await BEFORE navigating away)
   try {
     if (window.StorageManager && typeof window.StorageManager.saveRun === "function") {
-      window.StorageManager
-        .saveRun({ correct: score, attempted: totalAttempted, percent: percentage })
-        .catch((e) => console.error("StorageManager.saveRun failed:", e));
+      await window.StorageManager.saveRun({
+        correct: score,
+        attempted: totalAttempted,
+        percent: percentage,
+      });
     }
   } catch (e) {
     console.warn("StorageManager.saveRun failed:", e);
   }
 
-  // 2) Always write to Firestore for signed-in users so the Profile modal updates
-  (async () => {
-    try {
-      await commitRunToFirestore({ correct: score });
-    } catch (e) {
-      console.error("commitRunToFirestore failed:", e);
-    }
-  })();
+  try {
+    await commitRunToFirestore({ correct: score, attempted: totalAttempted });
+  } catch (e) {
+    console.error("commitRunToFirestore failed:", e);
+  }
 
-  // If we are in /pages/, go up one level to reach /pages/results.html
   const inPages = window.location.pathname.includes("/pages/");
-  window.location.href = inPages ? "../pages/results.html" : "results.html";
+  // From /pages/game.html -> results.html (same folder)
+  // From /index.html -> pages/results.html
+  window.location.href = inPages ? "results.html" : "pages/results.html";
 }
 
 /* ===========================
