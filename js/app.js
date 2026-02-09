@@ -10,6 +10,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  increment,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -112,6 +113,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function commitRunToFirestore({ correct }) {
+    const user = auth.currentUser;
+    if (!user) return; // guests don't write
+
+    const ref = doc(db, "users", user.uid);
+
+    // 1) increment totals
+    await updateDoc(ref, {
+      gamesPlayed: increment(1),
+      totalCorrect: increment(Number(correct) || 0),
+    });
+
+    // 2) recompute average (server values)
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data() || {};
+
+    const gp = Number(data.gamesPlayed || 0);
+    const tc = Number(data.totalCorrect || 0);
+    const avg = gp > 0 ? +(tc / gp).toFixed(2) : 0;
+
+    await updateDoc(ref, {
+      avgCorrectPerGame: avg,
+    });
+  }
+
   async function loadProfileIntoModal() {
     const user = auth.currentUser;
     if (!user) return;
@@ -139,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (games) games.textContent = data.gamesPlayed ?? 0;
-    if (correct) correct.textContent = data.totalCorrect ?? 0;
+    if (correct) correct.textContent = data.totalCorrect ?? data.correct ?? 0;
     if (avg) avg.textContent = Number(data.avgCorrectPerGame ?? 0).toFixed(2);
     if (rank) rank.textContent = "#—"; // later: compute via leaderboard query
 
@@ -454,7 +481,7 @@ function handleAnswer(selectedIndex, btnElement, optionsContainer) {
   buttons.forEach((b) => (b.disabled = true)); // prevent spam clicking
 
   const correctIndex = Number(currentQuestion.correctIndex);
-const correct = selectedIndex === correctIndex;
+  const correct = selectedIndex === correctIndex;
 
   if (correct) {
     score++;
@@ -503,7 +530,8 @@ function endGame() {
     console.warn("StorageManager.saveGameResult failed:", e);
   }
 
-  // Persist real stats to Firestore for signed-in users (and local stats for guests)
+  // Persist stats
+  // 1) If StorageManager exists, let it do its thing (local + optional remote)
   try {
     if (window.StorageManager && typeof window.StorageManager.saveRun === "function") {
       window.StorageManager
@@ -513,6 +541,15 @@ function endGame() {
   } catch (e) {
     console.warn("StorageManager.saveRun failed:", e);
   }
+
+  // 2) Always write to Firestore for signed-in users so the Profile modal updates
+  (async () => {
+    try {
+      await commitRunToFirestore({ correct: score });
+    } catch (e) {
+      console.error("commitRunToFirestore failed:", e);
+    }
+  })();
 
   // If we are in /pages/, go up one level to reach /pages/results.html
   const inPages = window.location.pathname.includes("/pages/");
