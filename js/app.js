@@ -157,6 +157,86 @@ document.addEventListener("DOMContentLoaded", () => {
   // Real signed-in check (Firebase Auth)
   const isSignedIn = () => !!auth.currentUser;
 
+  // MAIN MENU: Right panel Top 5 (guest = demo rows, signed-in = Firestore)
+  const mainLbList = document.getElementById("mainmenu-leaderboard-list");
+  const mainLbHint = document.getElementById("mainmenu-leaderboard-hint");
+  const guestTop5Html = mainLbList ? mainLbList.innerHTML : "";
+
+  const esc = (s) =>
+    String(s ?? "").replace(/[&<>\"']/g, (c) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[c]));
+
+  function restoreGuestTop5() {
+    if (!mainLbList) return;
+    mainLbList.innerHTML = guestTop5Html;
+    mainLbList.dataset.mode = "guest";
+    if (mainLbHint) mainLbHint.classList.add("hidden");
+  }
+
+  function renderMainMenuTop5(rows) {
+    if (!mainLbList) return;
+
+    const medal = (r) => (r === 1 ? "gold" : r === 2 ? "silver" : r === 3 ? "bronze" : "");
+
+    mainLbList.innerHTML = rows
+      .slice(0, 5)
+      .map((r, i) => {
+        const rank = i + 1;
+        const cls = medal(rank);
+        const name = esc(r.username || "AimPlayer");
+        const avg = Number(r.avgPercent || 0);
+        const avgText = Number.isFinite(avg) ? `${avg.toFixed(2)}%` : "0.00%";
+
+        return `
+          <div class="leaderboard-row ${cls}">
+            <span class="rank">${rank}</span>
+            <span class="name">${name}</span>
+            <span class="avg">${avgText}</span>
+          </div>
+        `;
+      })
+      .join("");
+
+    mainLbList.dataset.mode = "live";
+    if (mainLbHint) mainLbHint.classList.add("hidden");
+  }
+
+  async function loadMainMenuTop5FromFirestore() {
+    if (!mainLbList) return;
+
+    try {
+      const qTop = query(
+        collection(db, "users"),
+        orderBy("avgPercent", "desc"),
+        limit(25) // a few extra to skip gamesPlayed=0
+      );
+
+      const snap = await getDocs(qTop);
+      const rows = [];
+
+      snap.forEach((d) => {
+        const data = d.data() || {};
+        const games = Number(data.gamesPlayed || 0);
+        if (games <= 0) return;
+        rows.push({
+          username: data.username || "AimPlayer",
+          avgPercent: Number(data.avgPercent || 0),
+        });
+      });
+
+      renderMainMenuTop5(rows);
+    } catch (e) {
+      console.error("Main menu Top 5 load failed:", e);
+      if (mainLbHint) mainLbHint.classList.remove("hidden");
+      restoreGuestTop5();
+    }
+  }
+
   if (viewMoreBtn) {
     viewMoreBtn.addEventListener("click", () => {
       if (isSignedIn()) {
@@ -385,6 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } finally {
         // Immediately reflect guest UI
         forceGuestMode();
+        restoreGuestTop5();
       }
     });
   }
@@ -410,8 +491,14 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (e) {
         console.error("ensureUserDoc failed:", e);
       }
+
+      // Signed-in users: show REAL Top 5
+      await loadMainMenuTop5FromFirestore();
     } else {
       forceGuestMode();
+
+      // Guests: keep DEMO Top 5
+      restoreGuestTop5();
     }
   });
 
