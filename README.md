@@ -5,7 +5,7 @@ Players race against the clock, answer math questions, and compete on a global l
 
 Built with a modern glass-UI, Firebase authentication, and real-time leaderboard data.
 
-🌐 **Live Site:** https://aim-ib.homeschool-tutor.com  
+🌐 **Live Site:** https://aim-ib.com  
 📦 **Repository:** https://github.com/sid-kx/aim-ib-game
 
 ---
