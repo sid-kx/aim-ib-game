@@ -1,5 +1,3 @@
-
-
 // Aim-IB — Top 100 Leaderboard (Firestore)
 // Renders users ordered by avgCorrectPerGame desc into #lb-body.
 
@@ -42,46 +40,33 @@ async function renderTop100FromFirestore() {
   `;
 
   try {
-    // Order by avgCorrectPerGame (2 decimals stored as number) then gamesPlayed as a tiebreaker.
+    // Order by avgCorrectPerGame only to avoid requiring a composite index.
+    // We'll apply the gamesPlayed tiebreaker client-side.
     const q = query(
       collection(db, "users"),
       orderBy("avgCorrectPerGame", "desc"),
-      orderBy("gamesPlayed", "desc"),
-      limit(100)
+      limit(200)
     );
 
     const snap = await getDocs(q);
 
-    if (snap.empty) {
-      body.innerHTML = `
-        <div class="lb-row" role="row" style="grid-template-columns: 1fr; justify-items:center;">
-          <div class="lb-cell" role="cell" style="white-space:normal; text-align:center;">
-            No ranked players yet. Be the first to sign in and play!
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    const rows = [];
-    let rank = 0;
+    // Collect all candidates first, then sort with a deterministic tiebreak.
+    const players = [];
 
     snap.forEach((docSnap) => {
       const d = docSnap.data() || {};
-      // Only include users who have actually played at least 1 game.
       const games = Number(d.gamesPlayed || 0);
-      if (games <= 0) return;
-
-      rank += 1;
+      if (games <= 0) return; // only rank players who have played
 
       const username = escapeHtml(d.username || "AimPlayer");
-      const avg = Number(d.avgCorrectPerGame || 0).toFixed(2);
+      const avgNum = Number(d.avgCorrectPerGame || 0);
+      const avg = avgNum.toFixed(2);
       const totalCorrect = Number(d.totalCorrect || 0);
 
-      rows.push({ rank, username, avg, totalCorrect, games });
+      players.push({ username, avgNum, avg, totalCorrect, games });
     });
 
-    if (rows.length === 0) {
+    if (players.length === 0) {
       body.innerHTML = `
         <div class="lb-row" role="row" style="grid-template-columns: 1fr; justify-items:center;">
           <div class="lb-cell" role="cell" style="white-space:normal; text-align:center;">
@@ -91,6 +76,21 @@ async function renderTop100FromFirestore() {
       `;
       return;
     }
+
+    // Sort: avgCorrectPerGame desc, then gamesPlayed desc, then username asc.
+    players.sort((a, b) => {
+      if (b.avgNum !== a.avgNum) return b.avgNum - a.avgNum;
+      if (b.games !== a.games) return b.games - a.games;
+      return a.username.localeCompare(b.username);
+    });
+
+    const rows = players.slice(0, 100).map((p, idx) => ({
+      rank: idx + 1,
+      username: p.username,
+      avg: p.avg,
+      totalCorrect: p.totalCorrect,
+      games: p.games,
+    }));
 
     body.innerHTML = rows
       .map((p) => {
@@ -108,10 +108,27 @@ async function renderTop100FromFirestore() {
       .join("");
   } catch (err) {
     console.error("Leaderboard load failed:", err);
+
+    const code = err?.code ? String(err.code) : "unknown";
+    const msg = err?.message ? String(err.message) : String(err);
+
+    const isIndex = msg.toLowerCase().includes("index") || msg.toLowerCase().includes("indexes");
+    const isPerm = code.includes("permission") || msg.toLowerCase().includes("insufficient permissions");
+
+    let hint = "";
+    if (isPerm) {
+      hint = "Firestore rules must allow read access to /users.";
+    } else if (isIndex) {
+      hint = "This query needs a Firestore index. Open the browser console, click the index link, and create it.";
+    } else {
+      hint = "Open DevTools → Console for details.";
+    }
+
     body.innerHTML = `
       <div class="lb-row" role="row" style="grid-template-columns: 1fr; justify-items:center;">
         <div class="lb-cell" role="cell" style="white-space:normal; text-align:center;">
-          Leaderboard couldn’t load. Make sure Firestore rules allow read access.
+          Leaderboard couldn’t load. (${escapeHtml(code)})<br/>
+          <span style="opacity:.9; font-size:.95em;">${escapeHtml(hint)}</span>
         </div>
       </div>
     `;

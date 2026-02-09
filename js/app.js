@@ -377,20 +377,24 @@ function startGameSession() {
   timeLeft = 60;
 
   const grade = localStorage.getItem("aimIb_currentGrade") || "4";
-  document.getElementById("timer-display").innerText = timeLeft;
+  const td = document.getElementById("timer-display");
+  if (td) td.innerText = timeLeft;
   updateScoreUI();
   _qgRetries = 0;
   loadNewQuestion(grade);
 
   timerInterval = setInterval(() => {
     timeLeft--;
-    document.getElementById("timer-display").innerText = timeLeft;
+    const td2 = document.getElementById("timer-display");
+    if (td2) td2.innerText = timeLeft;
 
     // little “urgency” effect under 10s
-    if (timeLeft <= 10) {
-      document.getElementById("timer-display").style.filter = "drop-shadow(0 8px 14px rgba(255,92,92,0.55))";
-    } else {
-      document.getElementById("timer-display").style.filter = "";
+    if (td2) {
+      if (timeLeft <= 10) {
+        td2.style.filter = "drop-shadow(0 8px 14px rgba(255,92,92,0.55))";
+      } else {
+        td2.style.filter = "";
+      }
     }
 
     if (timeLeft <= 0) endGame();
@@ -427,6 +431,10 @@ function loadNewQuestion(grade) {
   document.getElementById("question-text").innerText = currentQuestion.question;
 
   const optionsContainer = document.getElementById("options-container");
+  if (!optionsContainer) {
+    console.error("Missing #options-container on game page.");
+    return;
+  }
   optionsContainer.innerHTML = "";
 
   currentQuestion.options.forEach((option, index) => {
@@ -445,7 +453,8 @@ function handleAnswer(selectedIndex, btnElement, optionsContainer) {
   const buttons = optionsContainer.querySelectorAll(".option-btn");
   buttons.forEach((b) => (b.disabled = true)); // prevent spam clicking
 
-  const correct = selectedIndex === currentQuestion.correctIndex;
+  const correctIndex = Number(currentQuestion.correctIndex);
+const correct = selectedIndex === correctIndex;
 
   if (correct) {
     score++;
@@ -453,7 +462,7 @@ function handleAnswer(selectedIndex, btnElement, optionsContainer) {
   } else {
     btnElement.classList.add("wrong");
     // also highlight the correct one quickly
-    const correctBtn = buttons[currentQuestion.correctIndex];
+    const correctBtn = buttons[correctIndex];
     if (correctBtn) correctBtn.classList.add("correct");
   }
 
@@ -467,8 +476,10 @@ function handleAnswer(selectedIndex, btnElement, optionsContainer) {
 }
 
 function updateScoreUI() {
-  document.getElementById("score-display").innerText = score;
+  const sd = document.getElementById("score-display");
+  if (sd) sd.innerText = String(score);
 }
+
 
 function endGame() {
   clearInterval(timerInterval);
@@ -483,13 +494,29 @@ function endGame() {
     JSON.stringify({ score, attempted: totalAttempted, percentage })
   );
 
-  // Update local average for guests and for quick UI
-  StorageManager.saveGameResult(percentage);
+  // Update local average for guests and for quick UI (StorageManager is optional)
+  try {
+    if (window.StorageManager && typeof window.StorageManager.saveGameResult === "function") {
+      window.StorageManager.saveGameResult(percentage);
+    }
+  } catch (e) {
+    console.warn("StorageManager.saveGameResult failed:", e);
+  }
 
-  // Persist real stats to Firestore for signed-in users (rank is based on avg correct/game)
-  StorageManager.saveRun({ correct: score, attempted: totalAttempted, percent: percentage }).catch(() => {});
+  // Persist real stats to Firestore for signed-in users (and local stats for guests)
+  try {
+    if (window.StorageManager && typeof window.StorageManager.saveRun === "function") {
+      window.StorageManager
+        .saveRun({ correct: score, attempted: totalAttempted, percent: percentage })
+        .catch((e) => console.error("StorageManager.saveRun failed:", e));
+    }
+  } catch (e) {
+    console.warn("StorageManager.saveRun failed:", e);
+  }
 
-  window.location.href = "results.html";
+  // If we are in /pages/, go up one level to reach /results.html
+  const inPages = window.location.pathname.includes("/pages/");
+  window.location.href = inPages ? "../results.html" : "results.html";
 }
 
 /* ===========================
@@ -497,7 +524,9 @@ function endGame() {
    =========================== */
 function showResults() {
   const data = JSON.parse(localStorage.getItem("aimIb_lastSession"));
-  const stats = StorageManager.getStats();
+  const stats = (window.StorageManager && typeof window.StorageManager.getStats === "function")
+    ? window.StorageManager.getStats()
+    : { average: 0 };
 
   if (data) {
     document.getElementById("final-score").innerText = data.percentage + "%";
