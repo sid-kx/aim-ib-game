@@ -18,6 +18,8 @@
   --radius: 22px;
   --radius2: 16px;
   --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Verdana, Arial, sans-serif;
+  --side-panel-w: 340px;
+  --side-panel-h: 410px;
 }
 
 *{ box-sizing:border-box; }
@@ -494,14 +496,14 @@ hr{
 ================================ */
 
 .account-panel{
-  width:260px;
-  padding:18px;
-  border-radius:22px;
+  width: var(--side-panel-w);
+  padding: 18px;
+  border-radius: 22px;
   box-shadow: var(--shadow);
-  height: 360px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
+  height: var(--side-panel-h);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .account-title{
@@ -626,11 +628,11 @@ hr{
 }
 
 .leaderboard-panel{
-  width: 320px;
+  width: var(--side-panel-w);
   padding: 18px;
   border-radius: 22px;
   box-shadow: var(--shadow);
-  height: 400px;
+  height: var(--side-panel-h);
   display:flex;
   flex-direction:column;
   justify-content:space-between;
@@ -708,6 +710,19 @@ hr{
   font-weight:950;
   background: linear-gradient(90deg,var(--primary),var(--purple));
   color:white;
+}
+
+/* Desktop-only: slightly smaller center panel so everything fits */
+@media (min-width: 901px){
+  body:not(.lb-scroll) .container{
+    width: min(500px, 92vw);
+    padding: 18px;
+  }
+
+  body:not(.lb-scroll) .title{ font-size: 2.55rem; }
+  body:not(.lb-scroll) .big-number{ font-size: 4.15rem; }
+  body:not(.lb-scroll) .btn{ padding: 14px 18px; }
+  body:not(.lb-scroll) .menu-box{ padding: 14px; }
 }
 
 /* Mobile stacking */
