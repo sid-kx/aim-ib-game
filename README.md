@@ -8,7 +8,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 🌐 **Live Site:** https://aim-ib.com  
 📦 **Repository:** https://github.com/sid-kx/aim-ib-game
 
----
+⸻
 
 ## 🚀 Features
 
@@ -23,7 +23,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 - ✨ **Modern glassmorphism UI**
 - ♿ **Keyboard-friendly & accessible UI**
 
----
+⸻
 
 ## 🕹 How to Play
 
@@ -35,7 +35,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 
 > Tip: Don’t overthink — speed + accuracy wins.
 
----
+⸻
 
 ## 📊 Scoring & Averages
 
@@ -47,7 +47,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 
 This keeps the leaderboard fair and skill-based.
 
----
+⸻
 
 ## 🏆 Leaderboard Logic
 
@@ -56,7 +56,7 @@ This keeps the leaderboard fair and skill-based.
 - Guests see a preview leaderboard (UI demo)
 - Data is stored securely in **Firebase Firestore**
 
----
+⸻
 
 ## 🧱 Tech Stack
 
@@ -66,7 +66,7 @@ This keeps the leaderboard fair and skill-based.
   - Cloud Firestore (player stats & leaderboard)
 - **Hosting:** GitHub Pages + Custom Domain
 
----
+⸻
 
 ## 🔐 Security
 
@@ -75,30 +75,7 @@ This keeps the leaderboard fair and skill-based.
   - Write access only for authenticated users
   - Users can only modify their own stats
 
----
-
-## 📁 Project Structure
-aim-ib-game/
-│
-├── index.html
-├── pages/
-│   ├── game.html
-│   ├── results.html
-│   └── leaderboard.html
-│
-├── css/
-│   └── styles.css
-│
-├── js/
-│   ├── app.js
-│   ├── firebase.js
-│   ├── leaderboard.js
-│   ├── questions.js
-│   └── storage.js
-│
-└── README.md
-
----
+⸻
 
 ## 🧪 Local Development
 
@@ -119,15 +96,14 @@ aim-ib-game/
 
 ⸻
 
-❤️ Credits
+##  Credits
 
-Made with ❤️ by Sidhant Kamboj
-Grade 11 | Ontario | Computer Science & Entrepreneurship
-
-If you like this project, feel free to ⭐ the repo or fork it!
+Made by Sidhant Kamboj
+Grade 12 | Ontario | Computer Science & Entrepreneurship
 
 ⸻
 
-📜 License
+## License
+
 
 MIT License — free to use, modify, and learn from.
