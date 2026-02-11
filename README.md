@@ -8,7 +8,6 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 🌐 **Live Site:** https://aim-ib.com  
 📦 **Repository:** https://github.com/sid-kx/aim-ib-game
 
-⸻
 
 ## 🚀 Features
 
@@ -23,7 +22,6 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 - ✨ **Modern glassmorphism UI**
 - ♿ **Keyboard-friendly & accessible UI**
 
-⸻
 
 ## 🕹 How to Play
 
@@ -35,7 +33,6 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 
 > Tip: Don’t overthink — speed + accuracy wins.
 
-⸻
 
 ## 📊 Scoring & Averages
 
@@ -47,7 +44,6 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 
 This keeps the leaderboard fair and skill-based.
 
-⸻
 
 ## 🏆 Leaderboard Logic
 
@@ -56,7 +52,6 @@ This keeps the leaderboard fair and skill-based.
 - Guests see a preview leaderboard (UI demo)
 - Data is stored securely in **Firebase Firestore**
 
-⸻
 
 ## 🧱 Tech Stack
 
@@ -66,7 +61,6 @@ This keeps the leaderboard fair and skill-based.
   - Cloud Firestore (player stats & leaderboard)
 - **Hosting:** GitHub Pages + Custom Domain
 
-⸻
 
 ## 🔐 Security
 
@@ -75,7 +69,6 @@ This keeps the leaderboard fair and skill-based.
   - Write access only for authenticated users
   - Users can only modify their own stats
 
-⸻
 
 ## 🧪 Local Development
 
@@ -85,7 +78,6 @@ This keeps the leaderboard fair and skill-based.
 2.	Open index.html in your browser
 (Firebase features require hosting or a local server)
 
-⸻
 
 🧠 Future Improvements
 	•	More grades & question types
@@ -94,16 +86,15 @@ This keeps the leaderboard fair and skill-based.
 	•	Streaks & achievements
 	•	Classroom / teacher dashboards
 
-⸻
 
 ##  Credits
 
 Made by Sidhant Kamboj
 Grade 12 | Ontario | Computer Science & Entrepreneurship
 
-⸻
 
 ## License
 
 
 MIT License — free to use, modify, and learn from.
+
