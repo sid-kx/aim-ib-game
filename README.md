@@ -1,4 +1,4 @@
-# 🎯 Aim-IB — Math Speed Run Game
+# Aim-IB — Math Speed Run Game
 
 **Aim-IB** is a fast-paced, IB-inspired math speed-run game designed to help students improve accuracy, speed, and confidence under pressure.  
 Players race against the clock, answer math questions, and compete on a global leaderboard.
@@ -9,7 +9,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 📦 **Repository:** https://github.com/sid-kx/aim-ib-game
 
 
-## 🚀 Features
+## Features
 
 - ⏱ **60-second math speed runs**
 - 🎓 **Grade-based questions (Grades 4–8)**
@@ -23,7 +23,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 - ♿ **Keyboard-friendly & accessible UI**
 
 
-## 🕹 How to Play
+## How to Play
 
 1. Pick a grade (4–8)
 2. Press **Start Game**
@@ -34,7 +34,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 > Tip: Don’t overthink — speed + accuracy wins.
 
 
-## 📊 Scoring & Averages
+## Scoring & Averages
 
 - **Game Accuracy (%)** =  
   `correct answers ÷ questions attempted × 100`
@@ -45,7 +45,7 @@ Built with a modern glass-UI, Firebase authentication, and real-time leaderboard
 This keeps the leaderboard fair and skill-based.
 
 
-## 🏆 Leaderboard Logic
+## Leaderboard Logic
 
 - Leaderboard ranks players by **average accuracy**
 - Only **signed-in users** appear on the real leaderboard
@@ -53,7 +53,7 @@ This keeps the leaderboard fair and skill-based.
 - Data is stored securely in **Firebase Firestore**
 
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - **Frontend:** HTML, CSS (Glass UI), Vanilla JavaScript
 - **Backend:** Firebase
@@ -62,7 +62,7 @@ This keeps the leaderboard fair and skill-based.
 - **Hosting:** GitHub Pages + Custom Domain
 
 
-## 🔐 Security
+## Security
 
 - Firestore rules ensure:
   - Public read access for leaderboard
@@ -70,7 +70,7 @@ This keeps the leaderboard fair and skill-based.
   - Users can only modify their own stats
 
 
-## 🧪 Local Development
+## Local Development
 
 1. Clone the repo:
    ```bash
@@ -87,7 +87,7 @@ This keeps the leaderboard fair and skill-based.
 	•	Classroom / teacher dashboards
 
 
-##  Credits
+## Credits
 
 Made by Sidhant Kamboj
 Grade 12 | Ontario | Computer Science & Entrepreneurship
@@ -97,4 +97,5 @@ Grade 12 | Ontario | Computer Science & Entrepreneurship
 
 
 MIT License — free to use, modify, and learn from.
+
 
